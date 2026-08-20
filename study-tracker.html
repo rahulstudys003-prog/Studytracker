@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XI B Study Tracker — Gulmohur High School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#faf9f5;
+    --grid:#e7e4da;
+    --ink:#1f2430;
+    --ink-soft:#5b6172;
+    --line:#d9d5c8;
+    --card:#ffffff;
+
+    --physics:#2f6fed;
+    --physics-soft:#e8effe;
+    --chemistry:#1e9e6d;
+    --chemistry-soft:#e4f6ee;
+    --biology:#e0821e;
+    --biology-soft:#fcefdf;
+    --psychology:#8b5cf6;
+    --psychology-soft:#f1ebfe;
+    --general:#5b6172;
+    --general-soft:#eceef2;
+    --exam:#e2385b;
+    --exam-soft:#fdeaee;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/100% 34px,
+      var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    padding:0 0 80px;
+    min-height:100vh;
+  }
+
+  .wrap{max-width:720px;margin:0 auto;padding:28px 20px 0;}
+
+  /* ---- Header / stamp ---- */
+  header{position:relative;padding-bottom:22px;border-bottom:2px solid var(--ink);margin-bottom:26px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-soft);margin:0 0 6px;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(26px,6vw,34px);
+    font-weight:700;margin:0 0 4px;line-height:1.1;
+  }
+  .sub{color:var(--ink-soft);font-size:14px;margin:0 0 18px;}
+
+  .stamp{
+    display:inline-flex;align-items:baseline;gap:10px;
+    border:2px solid var(--exam);color:var(--exam);
+    padding:8px 14px;border-radius:3px;
+    transform:rotate(-1.5deg);
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+  }
+  .stamp .num{font-size:22px;font-family:'Space Grotesk',sans-serif;font-weight:700;}
+  .stamp .txt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;}
+
+  /* ---- Overall progress ---- */
+  .overall{margin-top:18px;}
+  .overall-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+  .overall-row span:first-child{font-size:13px;font-weight:600;color:var(--ink-soft);}
+  .overall-row span:last-child{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink);}
+  .track{background:var(--grid);border-radius:20px;height:10px;overflow:hidden;}
+  .fill{height:100%;background:var(--ink);border-radius:20px;transition:width .4s ease;}
+
+  /* ---- Legend / subject bars ---- */
+  .legend{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0 8px;}
+  @media(max-width:480px){.legend{grid-template-columns:1fr;}}
+  .leg-item{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;}
+  .leg-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+  .leg-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .leg-count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);}
+  .leg-track{background:var(--grid);border-radius:20px;height:6px;overflow:hidden;}
+  .leg-fill{height:100%;border-radius:20px;transition:width .4s ease;}
+
+  /* ---- Phase sections ---- */
+  .phase{margin-top:34px;}
+  .phase-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;}
+  .phase-head h2{
+    font-family:'Space Grotesk',sans-serif;font-size:18px;margin:0;font-weight:600;
+  }
+  .phase-range{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);}
+
+  .timeline{position:relative;padding-left:22px;border-left:2px solid var(--line);}
+
+  .day{position:relative;margin-bottom:16px;}
+  .day::before{
+    content:'';position:absolute;left:-27.5px;top:6px;width:9px;height:9px;border-radius:50%;
+    background:var(--card);border:2px solid var(--ink-soft);
+  }
+  .day.today::before{background:var(--exam);border-color:var(--exam);}
+
+  .day-card{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px 10px;
+  }
+  .day-card.major{border-color:var(--exam);}
+  .day-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+  .date-badge{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--ink);}
+  .today-tag{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;
+    background:var(--exam);color:#fff;padding:2px 7px;border-radius:20px;font-weight:600;
+  }
+  .badges{display:flex;gap:6px;flex-wrap:wrap;}
+  .badge{
+    font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;
+    white-space:nowrap;
+  }
+  .exam-badge{background:var(--exam-soft);color:var(--exam);}
+  .weekend-badge{background:var(--general-soft);color:var(--general);}
+
+  .tasks{list-style:none;margin:0;padding:0;}
+  .task{
+    display:flex;align-items:flex-start;gap:9px;padding:6px 2px;
+    border-radius:6px;cursor:pointer;user-select:none;
+  }
+  .task:hover{background:#f7f6f1;}
+  .task input{
+    appearance:none;-webkit-appearance:none;
+    width:18px;height:18px;min-width:18px;margin-top:1px;
+    border:2px solid var(--ink-soft);border-radius:5px;
+    display:grid;place-content:center;cursor:pointer;
+  }
+  .task input::before{
+    content:'';width:10px;height:10px;border-radius:2px;transform:scale(0);transition:transform .12s ease;
+  }
+  .task input:checked::before{transform:scale(1);}
+  .task span.label{font-size:14px;line-height:1.4;}
+  .task input:checked ~ span.label{color:var(--ink-soft);text-decoration:line-through;}
+
+  .milestone{
+    display:flex;align-items:center;gap:8px;
+    font-family:'Space Grotesk',sans-serif;font-weight:600;color:var(--exam);font-size:14.5px;
+  }
+
+  footer{
+    max-width:720px;margin:40px auto 0;padding:18px 20px 0;
+    border-top:1px solid var(--line);
+    font-size:13px;color:var(--ink-soft);font-style:italic;text-align:center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Gulmohur High School · Class XI B · PCB + Psychology</p>
+    <h1>Half-Yearly Study Tracker</h1>
+    <p class="sub">20 August – 18 September 2026 · tick off each topic as you finish it</p>
+    <div class="stamp"><span class="num" id="daysToExam">–</span><span class="txt" id="stampTxt">days to first exam</span></div>
+
+    <div class="overall">
+      <div class="overall-row"><span>Overall progress</span><span id="overallPct">0%</span></div>
+      <div class="track"><div class="fill" id="overallFill" style="width:0%"></div></div>
+    </div>
+  </header>
+
+  <div class="legend" id="legend"></div>
+
+  <div id="phases"></div>
+
+  <footer>"Success is the sum of small efforts, repeated day in and day out." — Robert Collier</footer>
+</div>
+
+<script>
+const SUBJECTS = {
+  physics:    {name:'Physics',    color:'var(--physics)',    soft:'var(--physics-soft)'},
+  chemistry:  {name:'Chemistry',  color:'var(--chemistry)',  soft:'var(--chemistry-soft)'},
+  biology:    {name:'Biology',    color:'var(--biology)',    soft:'var(--biology-soft)'},
+  psychology: {name:'Psychology', color:'var(--psychology)', soft:'var(--psychology-soft)'},
+};
+
+const PHASES = [
+  { name:'Phase 1 · Physics + Biology restart', range:'20–27 Aug', days:[
+    {date:'2026-08-20', label:'Thu, 20 Aug', subject:'physics', tasks:['Dimensions','Motion in a Straight Line']},
+    {date:'2026-08-21', label:'Fri, 21 Aug', subject:'physics', tasks:['Vectors','Projectile Motion']},
+    {date:'2026-08-22', label:'Sat, 22 Aug', subject:'physics', weekend:true, tasks:["Newton's Laws",'Friction','Circular Motion']},
+    {date:'2026-08-23', label:'Sun, 23 Aug', subject:'biology', weekend:true, tasks:['Anatomy of Flowering Plants','Cell — Unit of Life','Cell Cycle and Cell Division']},
+    {date:'2026-08-24', label:'Mon, 24 Aug', subject:'biology', tasks:['Biomolecules','Photosynthesis in Higher Plants','Respiration in Plants']},
+    {date:'2026-08-25', label:'Tue, 25 Aug', subject:'physics', tasks:['Work, Power, Energy','Rotational Motion','Full recap — Physics & Biology']},
+    {date:'2026-08-26', label:'Wed, 26 Aug', subject:'physics', exam:'Physics Practical', tasks:['Light revision only — no new topics']},
+    {date:'2026-08-27', label:'Thu, 27 Aug', subject:'biology', exam:'Biology Practical', tasks:['Light revision only — no new topics']},
+  ]},
+  { name:'Phase 2 · Chemistry', range:'28 Aug – 4 Sep', days:[
+    {date:'2026-08-28', label:'Fri, 28 Aug', subject:'chemistry', tasks:['Ch1: Some Basic Concepts of Chemistry']},
+    {date:'2026-08-29', label:'Sat, 29 Aug', subject:'chemistry', weekend:true, tasks:['Ch2: Structure of Atom']},
+    {date:'2026-08-30', label:'Sun, 30 Aug', subject:'chemistry', weekend:true, tasks:['Ch3: Classification of Elements & Periodicity']},
+    {date:'2026-08-31', label:'Mon, 31 Aug', subject:'chemistry', tasks:['Ch4: Chemical Bonding and Molecular Structure']},
+    {date:'2026-09-01', label:'Tue, 01 Sep', subject:'chemistry', exam:'Chemistry Practical', tasks:['Revise practical concepts (morning)']},
+    {date:'2026-09-02', label:'Wed, 02 Sep', subject:'chemistry', tasks:['Ch7: Redox Reactions']},
+    {date:'2026-09-03', label:'Thu, 03 Sep', subject:'chemistry', tasks:['Ch8: Organic Chemistry — Isomerism & IUPAC (Part 1)']},
+    {date:'2026-09-04', label:'Fri, 04 Sep', subject:'chemistry', tasks:['Ch8: Organic Chemistry (Part 2)','Practice problems']},
+  ]},
+  { name:'Phase 3 · Biology push', range:'5–9 Sep', days:[
+    {date:'2026-09-05', label:'Sat, 05 Sep', subject:'biology', weekend:true, tasks:['Full Biology revision — all 6 chapters','Practice questions']},
+    {date:'2026-09-06', label:'Sun, 06 Sep', subject:'biology', weekend:true, tasks:['Full Biology revision — all 6 chapters','Practice questions']},
+    {date:'2026-09-07', label:'Mon, 07 Sep', subject:'biology', exam:'English Literature exam', tasks:['Light Biology revision (evening)']},
+    {date:'2026-09-08', label:'Tue, 08 Sep', subject:'biology', exam:'English Language exam', tasks:['Final Biology revision — exam tomorrow']},
+    {date:'2026-09-09', label:'Wed, 09 Sep', subject:'biology', exam:'BIOLOGY THEORY EXAM', major:true, tasks:[]},
+  ]},
+  { name:'Phase 4 · Physics push', range:'10–11 Sep', days:[
+    {date:'2026-09-10', label:'Thu, 10 Sep', subject:'physics', tasks:['Full Physics revision — all 9 topics']},
+    {date:'2026-09-11', label:'Fri, 11 Sep', subject:'physics', exam:'PHYSICS THEORY EXAM', major:true, tasks:[]},
+  ]},
+  { name:'Phase 5 · Chemistry + Psychology', range:'12–18 Sep', days:[
+    {date:'2026-09-12', label:'Sat, 12 Sep', subject:'chemistry', weekend:true, exam:'Hindi exam', tasks:['Chemistry revision']},
+    {date:'2026-09-13', label:'Sun, 13 Sep', subject:'chemistry', weekend:true, tasks:['Full Chemistry revision']},
+    {date:'2026-09-14', label:'Mon, 14 Sep', subject:'chemistry', exam:'Maths / Applied Maths exam', tasks:['Psychology prep','Chemistry revision']},
+    {date:'2026-09-15', label:'Tue, 15 Sep', subject:'psychology', exam:'PSYCHOLOGY EXAM', major:true, tasks:[]},
+    {date:'2026-09-16', label:'Wed, 16 Sep', subject:'chemistry', exam:'Political Science exam', tasks:['Chemistry final revision']},
+    {date:'2026-09-17', label:'Thu, 17 Sep', subject:'chemistry', tasks:['Full Chemistry revision — sleep early']},
+    {date:'2026-09-18', label:'Fri, 18 Sep', subject:'chemistry', exam:'CHEMISTRY THEORY EXAM — last paper!', major:true, tasks:[]},
+  ]},
+];
+
+let checkedState = {};
+
+function todayStr(){
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+
+async function loadState(){
+  try{
+    const res = await window.storage.get('study-tracker-checks', false);
+    checkedState = res && res.value ? JSON.parse(res.value) : {};
+  }catch(e){ checkedState = {}; }
+}
+
+async function saveState(){
+  try{ await window.storage.set('study-tracker-checks', JSON.stringify(checkedState), false); }
+  catch(e){ console.error('save failed', e); }
+}
+
+function taskId(dateStr, idx){ return dateStr + '__' + idx; }
+
+function render(){
+  const today = todayStr();
+
+  // countdown to first exam (7 Sep) or last exam if past
+  const firstExam = new Date('2026-09-07T00:00:00');
+  const lastExam = new Date('2026-09-18T00:00:00');
+  const now = new Date();
+  let diff = Math.ceil((firstExam - now) / 86400000);
+  let stampTxt = 'days to first exam';
+  if (diff < 0){
+    diff = Math.ceil((lastExam - now) / 86400000);
+    stampTxt = diff >= 0 ? 'days to last exam' : 'exams complete';
+  }
+  document.getElementById('daysToExam').textContent = diff >= 0 ? diff : '🎉';
+  document.getElementById('stampTxt').textContent = stampTxt;
+
+  // build phases + tally per subject
+  const phasesEl = document.getElementById('phases');
+  phasesEl.innerHTML = '';
+  const subjectTotals = {physics:0, chemistry:0, biology:0, psychology:0};
+  const subjectDone = {physics:0, chemistry:0, biology:0, psychology:0};
+  let totalTasks = 0, totalDone = 0;
+
+  PHASES.forEach(phase=>{
+    const phaseEl = document.createElement('div');
+    phaseEl.className = 'phase';
+    phaseEl.innerHTML = `<div class="phase-head"><h2>${phase.name}</h2><span class="phase-range">${phase.range}</span></div>`;
+    const tl = document.createElement('div');
+    tl.className = 'timeline';
+
+    phase.days.forEach(day=>{
+      const dayEl = document.createElement('div');
+      dayEl.className = 'day' + (day.date === today ? ' today' : '');
+
+      const card = document.createElement('div');
+      card.className = 'day-card' + (day.major ? ' major' : '');
+
+      const badges = [];
+      if (day.exam) badges.push(`<span class="badge exam-badge">${day.exam}</span>`);
+      if (day.weekend) badges.push(`<span class="badge weekend-badge">Weekend</span>`);
+
+      let head = `<div class="day-head">
+        <span class="date-badge">${day.label}${day.date===today ? ' <span class=\"today-tag\">TODAY</span>' : ''}</span>
+        <div class="badges">${badges.join('')}</div>
+      </div>`;
+
+      let body = '';
+      if (day.major && day.tasks.length === 0){
+        body = `<div class="milestone">📌 ${day.exam}</div>`;
+      } else {
+        const list = day.tasks.map((t, idx)=>{
+          const id = taskId(day.date, idx);
+          const checked = !!checkedState[id];
+          if (checked) totalDone++;
+          totalTasks++;
+          if (SUBJECTS[day.subject]){
+            subjectTotals[day.subject]++;
+            if (checked) subjectDone[day.subject]++;
+          }
+          const subj = SUBJECTS[day.subject];
+          return `<li class="task" data-id="${id}">
+            <input type="checkbox" ${checked?'checked':''} style="--dotcolor:${subj?subj.color:'var(--general)'}">
+            <span class="label">${t}</span>
+          </li>`;
+        }).join('');
+        body = `<ul class="tasks">${list}</ul>`;
+      }
+
+      card.innerHTML = head + body;
+      dayEl.appendChild(card);
+      tl.appendChild(dayEl);
+    });
+
+    phaseEl.appendChild(tl);
+    phasesEl.appendChild(phaseEl);
+  });
+
+  // tint each checkbox with its subject color (used via currentColor in CSS)
+  document.querySelectorAll('.task input').forEach(inp=>{
+    const c = inp.style.getPropertyValue('--dotcolor');
+    inp.style.color = c;
+    inp.style.borderColor = c;
+  });
+
+  // overall progress
+  const pct = totalTasks ? Math.round((totalDone/totalTasks)*100) : 0;
+  document.getElementById('overallPct').textContent = pct + '% · ' + totalDone + '/' + totalTasks + ' topics';
+  document.getElementById('overallFill').style.width = pct + '%';
+
+  // legend
+  const legendEl = document.getElementById('legend');
+  legendEl.innerHTML = '';
+  Object.keys(SUBJECTS).forEach(key=>{
+    const s = SUBJECTS[key];
+    const total = subjectTotals[key];
+    const done = subjectDone[key];
+    const p = total ? Math.round((done/total)*100) : 0;
+    const item = document.createElement('div');
+    item.className = 'leg-item';
+    item.innerHTML = `
+      <div class="leg-top">
+        <span class="leg-name"><span class="dot" style="background:${s.color}"></span>${s.name}</span>
+        <span class="leg-count">${done}/${total}</span>
+      </div>
+      <div class="leg-track"><div class="leg-fill" style="width:${p}%;background:${s.color}"></div></div>
+    `;
+    legendEl.appendChild(item);
+  });
+
+  // wire up clicks
+  document.querySelectorAll('.task').forEach(taskEl=>{
+    taskEl.addEventListener('click', async (e)=>{
+      if (e.target.tagName !== 'INPUT') {
+        const input = taskEl.querySelector('input');
+        input.checked = !input.checked;
+      }
+      const id = taskEl.dataset.id;
+      const input = taskEl.querySelector('input');
+      checkedState[id] = input.checked;
+      await saveState();
+      render();
+    });
+  });
+
+  // scroll today into view once on first load
+  if (!window.__scrolled){
+    window.__scrolled = true;
+    const todayEl = document.querySelector('.day.today');
+    if (todayEl) setTimeout(()=>todayEl.scrollIntoView({behavior:'smooth', block:'center'}), 300);
+  }
+}
+
+// inject checkbox fill color rule dynamically per subject via CSS variables on :root already set;
+// simplest fix: give the ::before a currentColor fill and set input color = subject color
+const styleFix = document.createElement('style');
+styleFix.textContent = `
+  .task input{ color: var(--general); }
+  .task input::before{ background: currentColor; }
+`;
+document.head.appendChild(styleFix);
+
+(async function init(){
+  await loadState();
+  render();
+})();
+</script>
+</body>
+</html>
